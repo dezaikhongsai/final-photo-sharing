@@ -18,3 +18,12 @@ export const getUserById = async (uId) => {
     throw error;
   }
 };
+
+export const updateUserById = async (uId, userData) => {
+  try {
+    const response = await axiosInstance.put(`/${uId}`, userData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

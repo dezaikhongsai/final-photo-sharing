@@ -63,3 +63,13 @@ export const getUserId = async (uId) => {
   }
   return user;
 };
+
+export const updateUser = async (uId, userData) => {
+  const userUpdated = await User.findByIdAndUpdate(uId, userData, {
+    new: true,
+  });
+  if (!userUpdated) {
+    throw new Error("User updated fail");
+  }
+  return userUpdated;
+};

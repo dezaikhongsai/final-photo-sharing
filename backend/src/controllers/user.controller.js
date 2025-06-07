@@ -3,6 +3,7 @@ import {
   loginUser,
   getAllUser,
   getUserId,
+  updateUser,
 } from "../services/user.service.js";
 
 export const registerUserController = async (req, res) => {
@@ -132,6 +133,24 @@ export const getUserByIdController = async (req, res) => {
     res.status(400).json({
       success: false,
       message: "Get user failed",
+    });
+  }
+};
+
+export const updateUserByIdController = async (req, res) => {
+  try {
+    const { uId } = req.params;
+    const userData = req.body;
+    const updatedUser = await updateUser(uId, userData);
+    res.status(200).json({
+      success: true,
+      message: "updated success",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
     });
   }
 };

@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getPhotosByUserId, addComment } from "./services/photo.service";
+import {
+  getPhotosByUserId,
+  addComment,
+  updateComment,
+  deleteComment,
+  deletePhoto,
+} from "./services/photo.service";
 import {
   Box,
   Typography,
@@ -12,6 +18,7 @@ import {
   ListItemText,
   Avatar,
   CircularProgress,
+  Button,
 } from "@mui/material";
 
 const Photo = () => {
@@ -21,6 +28,8 @@ const Photo = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [commentInputs, setCommentInputs] = useState({});
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editingText, setEditingText] = useState("");
   const fetchPhotoData = async () => {
     try {
       setLoading(true);
@@ -85,6 +94,46 @@ const Photo = () => {
     navigate(`/user/${record}`);
   };
 
+  const handleDeletePhoto = async (id) => {
+    console.log("photoId ---------", id);
+    try {
+      const res = await deletePhoto(id);
+      console.log("Xóa ảnh - phản hồi:", res);
+      alert("Xóa thành công");
+      await fetchPhotoData(); // Cập nhật lại danh sách
+    } catch (err) {
+      console.error("Lỗi khi xóa:", err);
+      const errorMessage =
+        err?.response?.data?.message || err.message || "Đã xảy ra lỗi";
+      await fetchPhotoData();
+    }
+  };
+  const handleDeleteComment = async (cId) => {
+    try {
+      await deleteComment(cId);
+      await fetchPhotoData();
+    } catch (error) {
+      console.error("Lỗi khi xóa bình luận:", error);
+      alert("Xóa thất bại");
+    }
+  };
+  const handleEditComment = (comment) => {
+    setEditingCommentId(comment._id);
+    setEditingText(comment.comment);
+  };
+
+  const handleSaveEditComment = async (cId) => {
+    try {
+      await updateComment(cId, { comment: editingText });
+      setEditingCommentId(null);
+      setEditingText("");
+      await fetchPhotoData();
+    } catch (error) {
+      console.error("Lỗi khi cập nhật bình luận:", error);
+      alert("Cập nhật thất bại");
+    }
+  };
+
   const BASE_IMAGE_URL = "https://z9zddm-5000.csb.app/uploads/";
 
   return (
@@ -116,6 +165,13 @@ const Photo = () => {
                 alt="Photo"
                 sx={{ objectFit: "contain", maxHeight: 500 }}
               />
+              <Button
+                onClick={() => {
+                  handleDeletePhoto(photo._id);
+                }}
+              >
+                Xóa bài viết
+              </Button>
               <CardContent>
                 <Typography variant="body2" color="text.secondary">
                   Đăng ngày: {formatDate(photo.day)}
@@ -127,39 +183,97 @@ const Photo = () => {
                       {photo.comments.map((comment) => (
                         <ListItem key={comment._id} alignItems="flex-start">
                           <Avatar sx={{ mr: 2 }}>
-                            {comment.userId?.first_name
-                              ? comment.userId.first_name[0].toUpperCase()
-                              : "U"}
+                            {comment.userId?.first_name?.[0] || "U"}
                           </Avatar>
                           <ListItemText
-                            onClick={() => handleViewPhoto(comment.userId._id)}
-                            primary={`${comment.userId?.first_name || "User"} ${
-                              comment.userId?.last_name || ""
-                            }`}
-                            onMouseOver={(e) =>
-                              (e.target.style.backgroundColor = "#d0d0d0")
-                            }
-                            onMouseOut={(e) =>
-                              (e.target.style.backgroundColor = "#e0e0e0")
+                            primary={
+                              <Typography
+                                variant="subtitle2"
+                                sx={{
+                                  cursor: "pointer",
+                                  "&:hover": {
+                                    textDecoration: "underline",
+                                    color: "primary.main",
+                                  },
+                                }}
+                                onClick={() =>
+                                  handleViewPhoto(comment.userId._id)
+                                }
+                              >
+                                {`${comment.userId?.first_name || "User"} ${
+                                  comment.userId?.last_name || ""
+                                }`}
+                              </Typography>
                             }
                             secondary={
-                              <>
-                                <Typography
-                                  component="span"
-                                  variant="body2"
-                                  color="text.primary"
-                                >
-                                  {comment.comment}
-                                </Typography>
-                                <br />
-                                <Typography
-                                  component="span"
-                                  variant="caption"
-                                  color="text.secondary"
-                                >
-                                  {formatDate(comment.day)}
-                                </Typography>
-                              </>
+                              editingCommentId === comment._id ? (
+                                <>
+                                  <input
+                                    type="text"
+                                    value={editingText}
+                                    onChange={(e) =>
+                                      setEditingText(e.target.value)
+                                    }
+                                    style={{
+                                      width: "100%",
+                                      padding: "6px",
+                                      marginTop: "6px",
+                                      marginBottom: "4px",
+                                      border: "1px solid #ccc",
+                                      borderRadius: "4px",
+                                    }}
+                                  />
+                                  <Box sx={{ display: "flex", gap: 1 }}>
+                                    <Button
+                                      size="small"
+                                      onClick={() =>
+                                        handleSaveEditComment(comment._id)
+                                      }
+                                    >
+                                      Lưu
+                                    </Button>
+                                    <Button
+                                      size="small"
+                                      color="inherit"
+                                      onClick={() => {
+                                        setEditingCommentId(null);
+                                        setEditingText("");
+                                      }}
+                                    >
+                                      Hủy
+                                    </Button>
+                                  </Box>
+                                </>
+                              ) : (
+                                <>
+                                  <Typography variant="body2">
+                                    {comment.comment}
+                                  </Typography>
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
+                                    {formatDate(comment.day)}
+                                  </Typography>
+                                  <Box sx={{ display: "flex", gap: 1 }}>
+                                    <Button
+                                      size="small"
+                                      onClick={() => handleEditComment(comment)}
+                                    >
+                                      Sửa
+                                    </Button>
+                                    <Button
+                                      size="small"
+                                      color="error"
+                                      onClick={() =>
+                                        handleDeleteComment(comment._id)
+                                      }
+                                    >
+                                      Xóa
+                                    </Button>
+                                  </Box>
+                                </>
+                              )
                             }
                           />
                         </ListItem>

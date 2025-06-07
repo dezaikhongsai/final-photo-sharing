@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   AppBar,
   Box,
@@ -17,12 +17,12 @@ import {
   ListItemButton,
   Divider,
   CircularProgress,
-  Button
-} from '@mui/material';
-import PropTypes from 'prop-types';
-import { logout } from './services/logout.service';
-import { getAllUsers } from './services/user.service';
-import ModalAddPhoto from './components/ModalAddPhoto';
+  Button,
+} from "@mui/material";
+import PropTypes from "prop-types";
+import { logout } from "./services/logout.service";
+import { getAllUsers } from "./services/user.service";
+import ModalAddPhoto from "./components/ModalAddPhoto";
 
 const DRAWER_WIDTH = 240;
 
@@ -32,14 +32,14 @@ const MainLayout = ({ children }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-   const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const getUserFromStorage = () => {
     try {
-      const userStr = localStorage.getItem('user');
+      const userStr = localStorage.getItem("user");
       if (!userStr) return null;
       return JSON.parse(userStr);
     } catch (error) {
-      console.error('Error parsing user data:', error);
+      console.error("Error parsing user data:", error);
       return null;
     }
   };
@@ -51,10 +51,10 @@ const MainLayout = ({ children }) => {
         const data = await getAllUsers();
         setUsers(data);
       } catch (err) {
-        console.error('Error loading users:', err);
-        setError('Không thể tải danh sách người dùng');
+        console.error("Error loading users:", err);
+        setError("Không thể tải danh sách người dùng");
         if (err.response?.status === 401) {
-          navigate('/login');
+          navigate("/login");
         }
       } finally {
         setLoading(false);
@@ -75,43 +75,47 @@ const MainLayout = ({ children }) => {
   const handleLogout = async () => {
     try {
       await logout();
-      localStorage.removeItem('user');
-      navigate('/login');
+      localStorage.removeItem("user");
+      navigate("/login");
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     }
   };
- const handleUploadSuccess = (data) => {
-    console.log('Ảnh mới:', data);
+  const handleUploadSuccess = (data) => {
+    console.log("Ảnh mới:", data);
   };
   const handleUserClick = (selectedUser) => {
-    console.log('Selected user:', selectedUser);
+    console.log("Selected user:", selectedUser);
     // navigate(`/photo/user/${selectedUser._id}`);
-    navigate(`/user/${selectedUser._id}`)
+    navigate(`/user/${selectedUser._id}`);
   };
   if (!user) {
-    navigate('/login');
+    navigate("/login");
     return null;
   }
+  const handleEditUser = () => {
+    console.log("userId to edit ", user.id);
+    navigate(`/user-edit/${user.id}`);
+  };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex" }}>
       <Drawer
         variant="permanent"
         sx={{
           width: DRAWER_WIDTH,
           flexShrink: 0,
-          '& .MuiDrawer-paper': {
+          "& .MuiDrawer-paper": {
             width: DRAWER_WIDTH,
-            boxSizing: 'border-box',
+            boxSizing: "border-box",
           },
         }}
       >
-        <Toolbar /> 
-        <Box sx={{ overflow: 'auto' }}>
+        <Toolbar />
+        <Box sx={{ overflow: "auto" }}>
           <List>
             {loading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+              <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
                 <CircularProgress />
               </Box>
             ) : error ? (
@@ -124,10 +128,10 @@ const MainLayout = ({ children }) => {
                   <ListItemButton onClick={() => handleUserClick(u)}>
                     <ListItemAvatar>
                       <Avatar>
-                        {u.first_name ? u.first_name[0].toUpperCase() : 'U'}
+                        {u.first_name ? u.first_name[0].toUpperCase() : "U"}
                       </Avatar>
                     </ListItemAvatar>
-                    <ListItemText 
+                    <ListItemText
                       primary={`${u.first_name} ${u.last_name}`}
                       secondary={u.username}
                     />
@@ -141,7 +145,10 @@ const MainLayout = ({ children }) => {
 
       {/* Main content */}
       <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <AppBar
+          position="fixed"
+          sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        >
           <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               Photo Sharing App
@@ -149,17 +156,19 @@ const MainLayout = ({ children }) => {
             <Button variant="contained" onClick={() => setModalOpen(true)}>
               Thêm ảnh
             </Button>
-
+            <Button variant="contained" onClick={handleEditUser}>
+              Chỉnh sửa thông tin cá nhân
+            </Button>
             <ModalAddPhoto
               open={modalOpen}
               onClose={() => setModalOpen(false)}
               onUploadSuccess={handleUploadSuccess}
             />
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
               <Typography variant="body1" sx={{ mr: 2 }}>
                 {user.firstName} {user.lastName}
               </Typography>
-              
+
               <IconButton
                 size="large"
                 aria-label="account of current user"
@@ -169,21 +178,21 @@ const MainLayout = ({ children }) => {
                 color="inherit"
               >
                 <Avatar sx={{ width: 32, height: 32 }}>
-                  {user.firstName ? user.firstName[0].toUpperCase() : 'U'}
+                  {user.firstName ? user.firstName[0].toUpperCase() : "U"}
                 </Avatar>
               </IconButton>
-              
+
               <Menu
                 id="menu-appbar"
                 anchorEl={anchorEl}
                 anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
+                  vertical: "bottom",
+                  horizontal: "right",
                 }}
                 keepMounted
                 transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
+                  vertical: "top",
+                  horizontal: "right",
                 }}
                 open={Boolean(anchorEl)}
                 onClose={handleClose}

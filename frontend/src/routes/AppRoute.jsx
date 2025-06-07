@@ -8,6 +8,7 @@ import NotFound from "../pages/notFound/NotFound";
 import Photo from "../pages/photo/Photo";
 import MainLayout from "../layouts/MainLayout";
 import UserDetail from "../pages/user/User";
+import UserEdit from "../pages/user/UserEdit";
 
 const AppRoute = () => {
   return (
@@ -40,6 +41,16 @@ const AppRoute = () => {
           <ProtectedRoute>
             <MainLayout>
               <UserDetail></UserDetail>
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user-edit/:userId"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <UserEdit />
             </MainLayout>
           </ProtectedRoute>
         }
