@@ -134,7 +134,7 @@ const Photo = () => {
     }
   };
 
-  const BASE_IMAGE_URL = "https://z9zddm-5000.csb.app/uploads/";
+  const BASE_IMAGE_URL = import.meta.env.VITE_API_UPLOAD;
 
   return (
     <Box sx={{ maxWidth: 600, mx: "auto", p: 2 }}>

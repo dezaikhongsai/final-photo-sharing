@@ -17,7 +17,7 @@ const ModalAddPhoto = ({ open, onClose, onUploadSuccess }) => {
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files?.[0] || null);
   };
-
+  const API_UPLOAD = import.meta.env.VITE_API_URL + "/photo/upload";
   const handleUpload = async () => {
     if (!selectedFile) return;
 
@@ -26,16 +26,12 @@ const ModalAddPhoto = ({ open, onClose, onUploadSuccess }) => {
 
     try {
       setUploading(true);
-      const res = await axios.post(
-        "https://z9zddm-5000.csb.app/api/photo/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          withCredentials: true,
-        }
-      );
+      const res = await axios.post(API_UPLOAD, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
 
       console.log("Upload thành công:", res.data);
       onUploadSuccess?.(res.data);
