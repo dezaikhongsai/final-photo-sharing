@@ -86,7 +86,8 @@ const MainLayout = ({ children }) => {
   };
   const handleUserClick = (selectedUser) => {
     console.log('Selected user:', selectedUser);
-    navigate(`/photo/user/${selectedUser._id}`);
+    // navigate(`/photo/user/${selectedUser._id}`);
+    navigate(`/user/${selectedUser._id}`)
   };
   if (!user) {
     navigate('/login');

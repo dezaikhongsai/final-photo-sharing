@@ -6,9 +6,9 @@ import {
   DialogActions,
   Input,
   Typography,
-} from '@mui/material';
-import { useState } from 'react';
-import axios from 'axios';
+} from "@mui/material";
+import { useState } from "react";
+import axios from "axios";
 
 const ModalAddPhoto = ({ open, onClose, onUploadSuccess }) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -22,22 +22,26 @@ const ModalAddPhoto = ({ open, onClose, onUploadSuccess }) => {
     if (!selectedFile) return;
 
     const formData = new FormData();
-    formData.append('photo', selectedFile);
+    formData.append("photo", selectedFile);
 
     try {
       setUploading(true);
-      const res = await axios.post('http://localhost:5000/api/photo/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        withCredentials: true, 
-      });
+      const res = await axios.post(
+        "https://z9zddm-5000.csb.app/api/photo/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
 
-      console.log('Upload thành công:', res.data);
-      onUploadSuccess?.(res.data); 
-      onClose(); 
+      console.log("Upload thành công:", res.data);
+      onUploadSuccess?.(res.data);
+      onClose();
     } catch (err) {
-      console.error('Upload lỗi:', err);
+      console.error("Upload lỗi:", err);
     } finally {
       setUploading(false);
       setSelectedFile(null);
@@ -56,13 +60,15 @@ const ModalAddPhoto = ({ open, onClose, onUploadSuccess }) => {
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={uploading}>Hủy</Button>
+        <Button onClick={onClose} disabled={uploading}>
+          Hủy
+        </Button>
         <Button
           onClick={handleUpload}
           variant="contained"
           disabled={!selectedFile || uploading}
         >
-          {uploading ? 'Đang tải...' : 'Tải lên'}
+          {uploading ? "Đang tải..." : "Tải lên"}
         </Button>
       </DialogActions>
     </Dialog>
